@@ -13,6 +13,7 @@ import {
   ChevronDown,
   Menu,
   X,
+  ArrowUpRight,
 } from 'lucide-react'
 
 const services = [
@@ -108,9 +109,9 @@ export function Navbar() {
   const [scrolled, setScrolled] = useState(false)
   const [menuOpen, setMenuOpen] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [mobileServicesOpen, setMobileServicesOpen] = useState(false)
 
   const pathname = usePathname()
-
   const LIME = '#DFFF1A'
 
   useEffect(() => {
@@ -119,20 +120,27 @@ export function Navbar() {
     }
 
     window.addEventListener('scroll', onScroll, { passive: true })
-
-    return () => {
-      window.removeEventListener('scroll', onScroll)
-    }
+    return () => window.removeEventListener('scroll', onScroll)
   }, [])
 
   useEffect(() => {
     const timer = setTimeout(() => {
       setMobileMenuOpen(false)
       setMenuOpen(false)
+      setMobileServicesOpen(false)
     }, 0)
 
     return () => clearTimeout(timer)
   }, [pathname])
+
+  // Prevent background scroll when mobile drawer is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = 'auto'
+    }
+  }, [mobileMenuOpen])
 
   return (
     <>
@@ -142,427 +150,583 @@ export function Navbar() {
           top: 0,
           left: 0,
           right: 0,
-          height: '75px',
-          backgroundColor: scrolled
-            ? 'rgba(5, 5, 5, 0.95)'
-            : 'transparent',
-          backdropFilter: scrolled ? 'blur(12px)' : 'none',
-          WebkitBackdropFilter: scrolled ? 'blur(12px)' : 'none',
-          borderBottom: scrolled
-            ? '1px solid rgba(255, 255, 255, 0.1)'
-            : 'none',
+          height: '84px',
           display: 'flex',
           alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 5%',
+          justifyContent: 'center',
+          padding: '0 20px',
           zIndex: 9999,
-          transition: 'all 0.3s ease',
+          pointerEvents: 'none',
         }}
       >
-        {/* Logo */}
-        <Link
-          href="/"
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: 10,
-            textDecoration: 'none',
-          }}
-        >
-          <div
-            style={{
-              width: 30,
-              height: 30,
-              borderRadius: 8,
-              background: LIME,
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: '#000',
-              fontWeight: 900,
-            }}
-          >
-            Z
-          </div>
-
-          <span
-            style={{
-              fontWeight: 800,
-              fontSize: 20,
-              color: '#fff',
-            }}
-          >
-            Zenvy<span style={{ color: LIME }}>.</span>
-          </span>
-        </Link>
-
-        {/* Desktop Navigation */}
-        <nav
-          className="hidden md:flex"
-          style={{
-            gap: '5px',
-            alignItems: 'center',
-          }}
-        >
-          <div
-            onMouseEnter={() => setMenuOpen(true)}
-            onMouseLeave={() => setMenuOpen(false)}
-            style={{
-              position: 'relative',
-              height: '75px',
-              display: 'flex',
-              alignItems: 'center',
-            }}
-          >
-            <button
-              style={{
-                background: 'transparent',
-                color: menuOpen ? LIME : '#fff',
-                border: 'none',
-                padding: '8px 15px',
-                cursor: 'pointer',
-                fontSize: 13,
-                fontWeight: 500,
-                display: 'flex',
-                alignItems: 'center',
-                gap: 4,
-              }}
-            >
-              Services
-              <ChevronDown
-                size={14}
-                style={{
-                  transform: menuOpen
-                    ? 'rotate(180deg)'
-                    : 'none',
-                  transition: '0.3s',
-                }}
-              />
-            </button>
-
-            {/* Mega Menu */}
-            {menuOpen && (
-              <div
-                style={{
-                  position: 'absolute',
-                  top: '100%',
-                  left: '50%',
-                  transform: 'translateX(-50%)',
-                  width: '840px',
-                  maxWidth: '90vw',
-                  background: '#0a0a0a',
-                  borderRadius: '0 0 16px 16px',
-                  border:
-                    '1px solid rgba(255,255,255,0.1)',
-                  display: 'grid',
-                  gridTemplateColumns:
-                    'repeat(3, 1fr)',
-                  padding: '30px',
-                  gap: '25px',
-                  boxShadow:
-                    '0 20px 40px rgba(0,0,0,0.6)',
-                }}
-              >
-                {services.map((srv) => (
-                  <div
-                    key={srv.id}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 10,
-                    }}
-                  >
-                    <Link
-                      href={`/services/${srv.slug}`}
-                      style={{
-                        display: 'flex',
-                        gap: 8,
-                        alignItems: 'center',
-                        textDecoration: 'none',
-                      }}
-                    >
-                      <div style={{ color: LIME }}>
-                        {srv.icon}
-                      </div>
-
-                      <div>
-                        <h4
-                          style={{
-                            margin: 0,
-                            fontSize: 13,
-                            fontWeight: 700,
-                            color: '#fff',
-                          }}
-                        >
-                          {srv.title}
-                        </h4>
-
-                        <p
-                          style={{
-                            margin: 0,
-                            fontSize: 10,
-                            color: '#666',
-                          }}
-                        >
-                          {srv.subtitle}
-                        </p>
-                      </div>
-                    </Link>
-
-                    <div
-                      style={{
-                        display: 'flex',
-                        flexDirection: 'column',
-                        gap: 1,
-                      }}
-                    >
-                      {srv.items.map((item) => (
-                        <Link
-                          key={item}
-                          href={`/services/${srv.slug}`}
-                          className="service-link-item"
-                          style={{
-                            fontSize: 11,
-                            color: '#888',
-                            textDecoration: 'none',
-                            padding: '5px 8px',
-                            borderRadius: 5,
-                          }}
-                        >
-                          {item}
-                        </Link>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {['Work', 'About', 'Pricing', 'Blog'].map(
-            (link) => (
-              <Link
-                key={link}
-                href={`/${link.toLowerCase()}`}
-                style={{
-                  padding: '8px 15px',
-                  textDecoration: 'none',
-                  fontSize: 13,
-                  color: '#eee',
-                  fontWeight: 500,
-                }}
-              >
-                {link}
-              </Link>
-            )
-          )}
-        </nav>
-
-        {/* Right Side */}
         <div
           style={{
+            width: '100%',
+            maxWidth: '1440px',
             display: 'flex',
             alignItems: 'center',
-            gap: 12,
+            justifyContent: 'space-between',
+            padding: scrolled ? '10px 20px' : '14px 24px',
+            borderRadius: 999,
+            backgroundColor: scrolled
+              ? 'rgba(10, 10, 14, 0.85)'
+              : 'rgba(10, 10, 14, 0.45)',
+            backdropFilter: 'blur(16px)',
+            WebkitBackdropFilter: 'blur(16px)',
+            border: scrolled
+              ? '1px solid rgba(223, 255, 26, 0.25)'
+              : '1px solid rgba(255, 255, 255, 0.08)',
+            boxShadow: scrolled
+              ? '0 20px 40px -15px rgba(0, 0, 0, 0.7), 0 0 25px rgba(223, 255, 26, 0.08), inset 0 1px 0 0 rgba(255, 255, 255, 0.12)'
+              : '0 10px 30px rgba(0, 0, 0, 0.4)',
+            transition: 'all 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
+            pointerEvents: 'auto',
           }}
         >
-          <div
-            className="hidden lg:flex"
+          {/* Logo */}
+          <Link
+            href="/"
             style={{
+              display: 'flex',
               alignItems: 'center',
-              gap: 15,
+              gap: 10,
+              textDecoration: 'none',
             }}
           >
             <div
               style={{
+                width: 32,
+                height: 32,
+                borderRadius: 10,
+                background: `linear-gradient(135deg, ${LIME} 0%, #b4db00 100%)`,
                 display: 'flex',
                 alignItems: 'center',
-                gap: 6,
-                fontSize: 11,
-                color: '#888',
+                justifyContent: 'center',
+                color: '#000',
+                fontWeight: 900,
+                fontSize: 15,
+                boxShadow: '0 4px 14px rgba(223, 255, 26, 0.4)',
+              }}
+            >
+              Z
+            </div>
+
+            <span
+              style={{
+                fontWeight: 800,
+                fontSize: 21,
+                color: '#fff',
+                letterSpacing: '-0.03em',
+              }}
+            >
+              Zenvy<span style={{ color: LIME }}>.</span>
+            </span>
+          </Link>
+
+          {/* Desktop Navigation */}
+          <nav
+            className="hidden md:flex"
+            style={{
+              gap: '6px',
+              alignItems: 'center',
+              background: 'rgba(255, 255, 255, 0.03)',
+              padding: '4px 8px',
+              borderRadius: 999,
+              border: '1px solid rgba(255, 255, 255, 0.06)',
+            }}
+          >
+            <div
+              onMouseEnter={() => setMenuOpen(true)}
+              onMouseLeave={() => setMenuOpen(false)}
+              style={{
+                position: 'relative',
+                display: 'flex',
+                alignItems: 'center',
+              }}
+            >
+              <button
+                style={{
+                  background: menuOpen
+                    ? 'rgba(223, 255, 26, 0.08)'
+                    : 'transparent',
+                  color: menuOpen ? LIME : '#d4d4d8',
+                  border: 'none',
+                  padding: '8px 16px',
+                  borderRadius: 999,
+                  cursor: 'pointer',
+                  fontSize: 13,
+                  fontWeight: 600,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 5,
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                Services
+                <ChevronDown
+                  size={14}
+                  style={{
+                    transform: menuOpen ? 'rotate(180deg)' : 'none',
+                    transition: 'transform 0.3s cubic-bezier(0.22, 1, 0.36, 1)',
+                  }}
+                />
+              </button>
+
+              {/* Mega Menu */}
+              {menuOpen && (
+                <div
+                  style={{
+                    position: 'absolute',
+                    top: 'calc(100% + 18px)',
+                    left: '50%',
+                    transform: 'translateX(-50%)',
+                    width: '880px',
+                    maxWidth: '92vw',
+                    background: 'rgba(12, 12, 16, 0.95)',
+                    backdropFilter: 'blur(20px)',
+                    WebkitBackdropFilter: 'blur(20px)',
+                    borderRadius: 24,
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    display: 'grid',
+                    gridTemplateColumns: 'repeat(3, 1fr)',
+                    padding: '28px',
+                    gap: '24px',
+                    boxShadow:
+                      '0 30px 70px -10px rgba(0, 0, 0, 0.8), 0 0 30px rgba(223, 255, 26, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+                  }}
+                >
+                  {services.map((srv) => (
+                    <div
+                      key={srv.id}
+                      style={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        gap: 10,
+                        padding: '12px',
+                        borderRadius: 16,
+                        background: 'rgba(255, 255, 255, 0.015)',
+                        border: '1px solid rgba(255, 255, 255, 0.04)',
+                      }}
+                    >
+                      <Link
+                        href={`/services/${srv.slug}`}
+                        style={{
+                          display: 'flex',
+                          gap: 10,
+                          alignItems: 'center',
+                          textDecoration: 'none',
+                        }}
+                      >
+                        <div
+                          style={{
+                            width: 32,
+                            height: 32,
+                            borderRadius: 8,
+                            background: 'rgba(223, 255, 26, 0.1)',
+                            border: '1px solid rgba(223, 255, 26, 0.25)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            color: LIME,
+                            flexShrink: 0,
+                          }}
+                        >
+                          {srv.icon}
+                        </div>
+
+                        <div>
+                          <h4
+                            style={{
+                              margin: 0,
+                              fontSize: 13,
+                              fontWeight: 700,
+                              color: '#fff',
+                            }}
+                          >
+                            {srv.title}
+                          </h4>
+
+                          <p
+                            style={{
+                              margin: 0,
+                              fontSize: 10,
+                              color: '#71717a',
+                              marginTop: 2,
+                            }}
+                          >
+                            {srv.subtitle}
+                          </p>
+                        </div>
+                      </Link>
+
+                      <div
+                        style={{
+                          display: 'flex',
+                          flexDirection: 'column',
+                          gap: 2,
+                          paddingLeft: 4,
+                        }}
+                      >
+                        {srv.items.map((item) => (
+                          <Link
+                            key={item}
+                            href={`/services/${srv.slug}`}
+                            className="service-link-item"
+                            style={{
+                              fontSize: 11,
+                              color: '#a1a1aa',
+                              textDecoration: 'none',
+                              padding: '5px 8px',
+                              borderRadius: 6,
+                            }}
+                          >
+                            {item}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+
+            {['Work', 'About', 'Pricing', 'Blog'].map((link) => (
+              <Link
+                key={link}
+                href={`/${link.toLowerCase()}`}
+                style={{
+                  padding: '8px 16px',
+                  borderRadius: 999,
+                  textDecoration: 'none',
+                  fontSize: 13,
+                  color: '#d4d4d8',
+                  fontWeight: 500,
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                {link}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Right Action */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: 14,
+            }}
+          >
+            <div
+              className="hidden lg:flex"
+              style={{
+                alignItems: 'center',
+                gap: 14,
               }}
             >
               <div
-                className="blink"
                 style={{
-                  width: 6,
-                  height: 6,
-                  borderRadius: '50%',
-                  background: LIME,
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: 8,
+                  fontSize: 12,
+                  color: '#a1a1aa',
+                  fontWeight: 500,
                 }}
-              />
+              >
+                <div
+                  style={{
+                    width: 7,
+                    height: 7,
+                    borderRadius: '50%',
+                    background: LIME,
+                    boxShadow: `0 0 10px ${LIME}`,
+                  }}
+                />
+                Available now
+              </div>
 
-              Available now
+              <Link
+                href="/contact"
+                style={{
+                  fontSize: 12,
+                  color: '#fff',
+                  padding: '7px 16px',
+                  border: '1px solid rgba(255, 255, 255, 0.15)',
+                  borderRadius: 999,
+                  textDecoration: 'none',
+                  fontWeight: 600,
+                  transition: 'all 0.2s ease',
+                }}
+              >
+                Let&apos;s talk
+              </Link>
             </div>
 
             <Link
               href="/contact"
+              className="hidden md:flex"
               style={{
                 fontSize: 12,
-                color: '#fff',
-                padding: '6px 14px',
-                border:
-                  '1px solid rgba(255,255,255,0.2)',
-                borderRadius: 100,
+                fontWeight: 800,
+                padding: '9px 20px',
+                borderRadius: 999,
+                background: LIME,
+                color: '#000',
                 textDecoration: 'none',
+                alignItems: 'center',
+                gap: 6,
+                boxShadow: '0 0 20px rgba(223, 255, 26, 0.25)',
+                transition: 'all 0.2s ease',
               }}
             >
-              Let's talk
+              Start Project
+              <ArrowUpRight size={15} />
             </Link>
+
+            {/* Mobile Toggle Button (Visible strictly on mobile/tablet) */}
+            <button
+              className="flex md:hidden items-center justify-center p-2 rounded-full cursor-pointer text-white background-color: color-mix(in oklab, var(--color-white) /* #fff = #ffffff */ 6%, transparent) border border-white/[0.12] transition-colors hover:bg-white/[0.12]"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label="Toggle mobile menu"
+            >
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
           </div>
-
-          <Link
-            href="/contact"
-            className="hidden md:block"
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              padding: '10px 22px',
-              borderRadius: 100,
-              background: LIME,
-              color: '#000',
-              textDecoration: 'none',
-            }}
-          >
-            Start Project →
-          </Link>
-
-          {/* Mobile Menu Button */}
-          <button
-            className="md:hidden"
-            onClick={() =>
-              setMobileMenuOpen(!mobileMenuOpen)
-            }
-            style={{
-              background: 'none',
-              border: 'none',
-              color: '#fff',
-              cursor: 'pointer',
-              padding: 5,
-            }}
-            aria-label="Toggle mobile menu"
-          >
-            {mobileMenuOpen ? (
-              <X size={26} />
-            ) : (
-              <Menu size={26} />
-            )}
-          </button>
         </div>
       </header>
 
-      {/* Mobile Menu */}
+      {/* =========================================================
+          RESPONSIVE 3D MOBILE MENU OVERLAY & DRAWER (< 768px)
+      ========================================================= */}
+      {/* Backdrop Fog */}
       <div
+        onClick={() => setMobileMenuOpen(false)}
+        className="md:hidden"
         style={{
           position: 'fixed',
           inset: 0,
-          background: '#050505',
+          backgroundColor: 'rgba(0, 0, 0, 0.65)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          zIndex: 9997,
+          opacity: mobileMenuOpen ? 1 : 0,
+          pointerEvents: mobileMenuOpen ? 'auto' : 'none',
+          transition: 'opacity 0.35s ease',
+        }}
+      />
+
+      {/* Floating 3D Mobile Modal Sheet */}
+      <div
+        className="md:hidden"
+        style={{
+          position: 'fixed',
+          top: '90px',
+          left: '16px',
+          right: '16px',
+          maxHeight: 'calc(100dvh - 110px)',
+          backgroundColor: 'rgba(12, 12, 16, 0.95)',
+          backdropFilter: 'blur(24px)',
+          WebkitBackdropFilter: 'blur(24px)',
+          borderRadius: 24,
+          border: '1px solid rgba(223, 255, 26, 0.2)',
+          boxShadow:
+            '0 25px 60px -15px rgba(0,0,0,0.9), 0 0 30px rgba(223,255,26,0.1), inset 0 1px 0 rgba(255,255,255,0.15)',
           zIndex: 9998,
           transform: mobileMenuOpen
-            ? 'translateX(0)'
-            : 'translateX(100%)',
-          transition:
-            'transform 0.4s cubic-bezier(0.4, 0, 0.2, 1)',
-          padding: '100px 30px 40px',
+            ? 'translateY(0) scale(1)'
+            : 'translateY(-20px) scale(0.96)',
+          opacity: mobileMenuOpen ? 1 : 0,
+          pointerEvents: mobileMenuOpen ? 'auto' : 'none',
+          transition: 'all 0.35s cubic-bezier(0.22, 1, 0.36, 1)',
           display: 'flex',
           flexDirection: 'column',
-          gap: 30,
-          overflowY: 'auto',
+          overflow: 'hidden',
         }}
       >
-        <div>
-          <p
-            style={{
-              fontSize: 11,
-              fontWeight: 800,
-              color: LIME,
-              textTransform: 'uppercase',
-              marginBottom: 20,
-              letterSpacing: 1,
-            }}
-          >
-            Services
-          </p>
-
-          <div
-            style={{
-              display: 'grid',
-              gap: 20,
-            }}
-          >
-            {services.map((srv) => (
-              <div key={srv.id}>
-                <Link
-                  href={`/services/${srv.slug}`}
-                  style={{
-                    fontSize: 18,
-                    fontWeight: 700,
-                    color: '#fff',
-                    textDecoration: 'none',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: 15,
-                  }}
-                >
-                  <span style={{ color: LIME }}>
-                    {srv.icon}
-                  </span>
-
-                  {srv.title}
-                </Link>
-              </div>
-            ))}
-          </div>
-        </div>
-
         <div
           style={{
-            height: '1px',
-            background:
-              'rgba(255,255,255,0.1)',
-          }}
-        />
-
-        <div
-          style={{
+            padding: '24px 20px',
+            overflowY: 'auto',
             display: 'flex',
             flexDirection: 'column',
             gap: 20,
           }}
         >
-          {['Work', 'About', 'Pricing', 'Blog'].map(
-            (link) => (
+          {/* Services Accordion Button */}
+          <div
+            style={{
+              borderRadius: 16,
+              background: 'rgba(255, 255, 255, 0.02)',
+              border: '1px solid rgba(255, 255, 255, 0.06)',
+              overflow: 'hidden',
+            }}
+          >
+            <button
+              onClick={() => setMobileServicesOpen(!mobileServicesOpen)}
+              style={{
+                width: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '14px 16px',
+                background: 'none',
+                border: 'none',
+                color: mobileServicesOpen ? LIME : '#fff',
+                fontSize: 16,
+                fontWeight: 700,
+                cursor: 'pointer',
+              }}
+            >
+              <span>Our Services</span>
+              <ChevronDown
+                size={18}
+                style={{
+                  transform: mobileServicesOpen ? 'rotate(180deg)' : 'none',
+                  transition: 'transform 0.3s ease',
+                  color: mobileServicesOpen ? LIME : '#71717a',
+                }}
+              />
+            </button>
+
+            {/* Accordion Content */}
+            {mobileServicesOpen && (
+              <div
+                style={{
+                  padding: '0 16px 16px',
+                  display: 'grid',
+                  gridTemplateColumns: 'repeat(2, 1fr)',
+                  gap: 12,
+                }}
+              >
+                {services.map((srv) => (
+                  <Link
+                    key={srv.id}
+                    href={`/services/${srv.slug}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                    style={{
+                      padding: '10px',
+                      borderRadius: 12,
+                      background: 'rgba(255, 255, 255, 0.03)',
+                      border: '1px solid rgba(255, 255, 255, 0.05)',
+                      textDecoration: 'none',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 4,
+                    }}
+                  >
+                    <div style={{ color: LIME }}>{srv.icon}</div>
+                    <span
+                      style={{
+                        fontSize: 12,
+                        fontWeight: 600,
+                        color: '#fff',
+                      }}
+                    >
+                      {srv.title}
+                    </span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Core Page Links */}
+          <div
+            style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(2, 1fr)',
+              gap: 10,
+            }}
+          >
+            {['Work', 'About', 'Pricing', 'Blog'].map((link) => (
               <Link
                 key={link}
                 href={`/${link.toLowerCase()}`}
+                onClick={() => setMobileMenuOpen(false)}
                 style={{
-                  fontSize: 22,
+                  padding: '14px',
+                  borderRadius: 14,
+                  background: 'rgba(255, 255, 255, 0.02)',
+                  border: '1px solid rgba(255, 255, 255, 0.06)',
+                  color: '#e4e4e7',
+                  fontSize: 15,
                   fontWeight: 600,
-                  color: '#fff',
                   textDecoration: 'none',
+                  textAlign: 'center',
                 }}
               >
                 {link}
               </Link>
-            )
-          )}
-        </div>
+            ))}
+          </div>
 
-        <Link
-          href="/contact"
-          style={{
-            background: LIME,
-            color: '#000',
-            padding: '18px',
-            borderRadius: 100,
-            textAlign: 'center',
-            fontWeight: 800,
-            textDecoration: 'none',
-            marginTop: 10,
-          }}
-        >
-          Start Project →
-        </Link>
+          {/* Quick Contact & Status */}
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              padding: '12px 16px',
+              borderRadius: 14,
+              background: 'rgba(223, 255, 26, 0.04)',
+              border: '1px solid rgba(223, 255, 26, 0.15)',
+            }}
+          >
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <div
+                style={{
+                  width: 8,
+                  height: 8,
+                  borderRadius: '50%',
+                  background: LIME,
+                  boxShadow: `0 0 10px ${LIME}`,
+                }}
+              />
+              <span style={{ fontSize: 12, color: '#a1a1aa', fontWeight: 500 }}>
+                Available for Q3
+              </span>
+            </div>
+
+            <Link
+              href="/contact"
+              onClick={() => setMobileMenuOpen(false)}
+              style={{
+                fontSize: 12,
+                color: '#fff',
+                textDecoration: 'underline',
+                fontWeight: 600,
+              }}
+            >
+              Let&apos;s talk
+            </Link>
+          </div>
+
+          {/* Primary Mobile CTA Button */}
+          <Link
+            href="/contact"
+            onClick={() => setMobileMenuOpen(false)}
+            style={{
+              width: '100%',
+              padding: '15px',
+              borderRadius: 999,
+              background: LIME,
+              color: '#000',
+              fontWeight: 800,
+              fontSize: 14,
+              textAlign: 'center',
+              textDecoration: 'none',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              gap: 8,
+              boxShadow: '0 0 25px rgba(223, 255, 26, 0.3)',
+            }}
+          >
+            Start Your Project
+            <ArrowUpRight size={16} />
+          </Link>
+        </div>
       </div>
     </>
   )

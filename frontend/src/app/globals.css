@@ -35,6 +35,18 @@ body {
   max-width: 100%;
 }
 
+/* Default Smooth Browser Cursors */
+html, body {
+  cursor: auto !important;
+}
+
+a,
+button,
+[data-hover],
+[role="button"] {
+  cursor: pointer !important;
+}
+
 /* Scroll Progress Bar */
 .scroll-progress {
   position: fixed;
@@ -44,21 +56,10 @@ body {
   background: linear-gradient(
     90deg,
     var(--color-primary),
-    var(--color-accent2)
+    var(--color-lime)
   );
   z-index: 2000;
   transition: width 0.1s linear;
-}
-
-/* Custom Cursor */
-* {
-  cursor: none !important;
-}
-
-a,
-button,
-[data-hover] {
-  cursor: none !important;
 }
 
 /* Blink */
@@ -71,7 +72,6 @@ button,
   100% {
     opacity: 1;
   }
-
   50% {
     opacity: 0.3;
   }
@@ -83,7 +83,6 @@ button,
   100% {
     box-shadow: 0 0 0 0 rgba(91, 79, 232, 0.4);
   }
-
   50% {
     box-shadow: 0 0 0 8px rgba(91, 79, 232, 0);
   }
@@ -93,26 +92,30 @@ button,
   animation: logoPulse 3s ease-in-out infinite;
 }
 
-/* Custom Scrollbar */
+/* Modern Minimalist Scrollbar */
 ::-webkit-scrollbar {
-  width: 5px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-bg);
+  background: #050505;
 }
 
 ::-webkit-scrollbar-thumb {
+  background: #27272a;
+  border-radius: 999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
   background: var(--color-lime);
-  border-radius: 10px;
 }
 
 /* Service Item Hover */
 .service-link-item:hover {
-  background: rgba(223, 255, 26, 0.05) !important;
+  background: rgba(223, 255, 26, 0.08) !important;
   color: var(--color-lime) !important;
   padding-left: 10px !important;
-  transition: all 0.3s ease;
+  transition: all 0.25s ease;
 }
 
 /* Reveal Animation */
@@ -141,18 +144,5 @@ button,
 }
 
 .footer-bg-text:hover {
-  -webkit-text-stroke-color: rgba(91, 79, 232, 0.2);
-}
-
-/* Cursor disabled on touch devices */
-@media (hover: none) and (pointer: coarse) {
-  * {
-    cursor: auto !important;
-  }
-
-  a,
-  button,
-  [data-hover] {
-    cursor: pointer !important;
-  }
+  -webkit-text-stroke-color: rgba(223, 255, 26, 0.3);
 }

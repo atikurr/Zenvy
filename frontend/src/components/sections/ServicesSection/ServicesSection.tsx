@@ -1,127 +1,198 @@
-import Link from 'next/link'
-import { ArrowUpRight } from 'lucide-react'
-import styles from './ServicesSection.module.css'
+"use client";
+
+import React, { useEffect, useRef } from "react";
+import Link from "next/link";
+import Image from "next/image";
+import { ArrowUpRight } from "lucide-react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import styles from "./ServicesSection.module.css";
+
+gsap.registerPlugin(ScrollTrigger);
 
 const services = [
   {
-    id: 'brand-design',
-    num: '01',
-    icon: '🎨',
-    title: 'Brand Design',
-    desc: 'We craft timeless visual identities that make your brand unforgettable — from logo to full brand system.',
-    tags: ['Brand Identity', 'Logo Design', 'Brand Strategy'],
-    href: '/services/brand-design',
+    id: "brand-design",
+    number: "01",
+    title: "Brand Design & Visual Identity",
+    slug: "brand-design",
+    description:
+      "Crafting memorable visual identities, design systems, and guidelines that make modern brands instantly recognizable across global markets.",
+    tags: ["Brand Identity", "Design System", "Motion Design", "Strategy"],
+    image: "/Images/services/brand-design.png",
   },
   {
-    id: 'ui-ux-design',
-    num: '02',
-    icon: '🖥️',
-    title: 'UI/UX Design',
-    desc: 'Research-backed interfaces that users love. From wireframes to pixel-perfect designs that convert.',
-    tags: ['UX Research', 'Wireframing', 'Design System'],
-    href: '/services/ui-ux-design',
+    id: "ui-ux-design",
+    number: "02",
+    title: "UI/UX & Product Design",
+    slug: "ui-ux-design",
+    description:
+      "Architecting clean, friction-free interfaces and user flows designed to improve product retention and conversion metrics.",
+    tags: ["UX Audit", "Wireframing", "Prototyping", "Design System"],
+    image: "/Images/services/ui-ux-design.png",
   },
   {
-    id: 'seo',
-    num: '03',
-    icon: '📈',
-    title: 'SEO Strategy',
-    desc: 'Dominate search rankings with technical SEO, content strategy, and e-commerce optimization.',
-    tags: ['Website SEO', 'YouTube SEO', 'E-commerce SEO'],
-    href: '/services/seo',
+    id: "seo",
+    number: "03",
+    title: "SEO & Growth Engine",
+    slug: "seo",
+    description:
+      "Dominating organic search with technical SEO, keyword distribution, and content architectures engineered to drive qualified traffic.",
+    tags: ["Technical SEO", "Etsy / Shopify SEO", "YouTube SEO", "Audits"],
+    image: "/Images/services/seo.jpg",
   },
   {
-    id: 'digital-marketing',
-    num: '04',
-    icon: '📣',
-    title: 'Digital Marketing',
-    desc: 'Scale your brand with data-driven Meta Ads, Google Ads, and social media management.',
-    tags: ['Meta Ads', 'Google Ads', 'Social Media'],
-    href: '/services/digital-marketing',
+    id: "digital-marketing",
+    number: "04",
+    title: "Digital Marketing & Performance",
+    slug: "digital-marketing",
+    description:
+      "Executing high-yield paid and organic campaigns across Meta and Google that deliver measurable conversion pipeline growth.",
+    tags: ["Meta Ads", "Google Ads", "Content Strategy", "Analytics"],
+    image: "/Images/services/digital-marketing.jpg",
   },
   {
-    id: 'web-design-development',
-    num: '05',
-    icon: '💻',
-    title: 'Web Design & Dev',
-    desc: 'High-performance websites built with Next.js — fast, SEO-ready, and designed to convert visitors.',
-    tags: ['Next.js', 'E-commerce', 'SaaS Website'],
-    href: '/services/web-design-development',
+    id: "web-design-development",
+    number: "05",
+    title: "Web Development & 3D Interactive",
+    slug: "web-design-development",
+    description:
+      "Building high-performance Next.js web applications featuring WebGL, GSAP micro-interactions, and responsive design systems.",
+    tags: ["Next.js", "React / Three.js", "Tailwind CSS", "High Performance"],
+    image: "/Images/services/web-design.jpg",
   },
   {
-    id: 'app-design-development',
-    num: '06',
-    icon: '📱',
-    title: 'App Design & Dev',
-    desc: 'Mobile-first app experiences for iOS and Android — from prototype to launch.',
-    tags: ['iOS', 'Android', 'App Prototype'],
-    href: '/services/app-design-development',
+    id: "app-design-development",
+    number: "06",
+    title: "Mobile App Architecture",
+    slug: "app-design-development",
+    description:
+      "Creating seamless native-feel mobile applications for iOS and Android with intuitive ergonomics and scalable foundations.",
+    tags: ["iOS Design", "Android Design", "Cross-Platform", "App Prototypes"],
+    image: "/Images/services/mobile-app-design.jpg",
   },
-]
+];
 
 export function ServicesSection() {
-  return (
-    <section className={styles.section}>
-      <div className={styles.inner}>
+  const containerRef = useRef<HTMLDivElement>(null);
+  const cardsRef = useRef<(HTMLAnchorElement | null)[]>([]);
 
-        {/* Top row */}
-        <div className={styles.topRow}>
+  useEffect(() => {
+    const cards = cardsRef.current.filter(Boolean);
+    if (!cards.length) return;
+
+    const ctx = gsap.context(() => {
+      cards.forEach((card, index) => {
+        if (index === cards.length - 1) return; // শেষ কার্ড স্কেল করার প্রয়োজন নেই
+
+        const nextCard = cards[index + 1];
+
+        gsap.to(card, {
+          scale: 0.9,
+          opacity: 0.35,
+          filter: "blur(4px)",
+          ease: "power2.out",
+          scrollTrigger: {
+            trigger: nextCard,
+            start: "top 80%",
+            end: "top 25%",
+            scrub: 0.5,
+          },
+        });
+      });
+    }, containerRef);
+
+    return () => ctx.revert();
+  }, []);
+
+  return (
+    <section id="services" ref={containerRef} className={styles.section}>
+      <div className={styles.ambientGlow} />
+
+      <div className={styles.inner}>
+        {/* Header */}
+        <div className={styles.header}>
           <div>
-            <div className={styles.tag}>
-              <span className={styles.tagLine} />
-              What We Do
+            <div className={styles.eyebrow}>
+              <span className={styles.eyebrowDot} />
+              WHAT WE DO
             </div>
-            <h2 className={styles.headline}>
-              Services Built to{' '}
-              <span className={styles.headlineAccent}>
-                Grow
-              </span>{' '}
+            <h2 className={styles.heading}>
+              Services Built to <span>Grow</span>
+              <br />
               Your Business.
             </h2>
           </div>
 
-          <div>
-            <p className={styles.subText}>
-              From strategy to execution — we handle everything
-              so you can focus on what matters most.
+          <div className={styles.headerRight}>
+            <p className={styles.subtext}>
+              From strategy to execution — we handle everything so you can focus on what matters most.
             </p>
-            <Link href="/services" className={styles.viewAllBtn}>
-              View All Services <ArrowUpRight size={15} />
+            <Link href="/services" className={styles.viewAll}>
+              View All Services
+              <ArrowUpRight size={16} />
             </Link>
           </div>
         </div>
 
-        {/* Grid */}
-        <div className={styles.grid}>
-          {services.map((srv) => (
+        {/* 3D Depth Stacked Cards */}
+        <div className={styles.cardsStack}>
+          {services.map((service, index) => (
             <Link
-              key={srv.id}
-              href={srv.href}
-              className={styles.card}
+              key={service.id}
+              href={`/services/${service.slug}`}
+              ref={(el) => {
+                cardsRef.current[index] = el;
+              }}
+              className={styles.stickyCard}
+              style={{
+                zIndex: index + 1,
+              }}
             >
-              <div className={styles.cardTop}>
-                <div className={styles.iconWrap}>{srv.icon}</div>
-                <span className={styles.cardNum}>{srv.num}</span>
+              {/* Left Content */}
+              <div className={styles.cardContent}>
+                <div className={styles.cardTop}>
+                  <span className={styles.numberTag}>{service.number}</span>
+                  <div className={styles.divider} />
+                  <span className={styles.scopeTag}>Agency Service</span>
+                </div>
+
+                <div className={styles.cardBody}>
+                  <h3 className={styles.cardTitle}>{service.title}</h3>
+                  <p className={styles.cardDescription}>{service.description}</p>
+
+                  <div className={styles.tagsWrap}>
+                    {service.tags.map((tag) => (
+                      <span key={tag} className={styles.tagPill}>
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
+                <div className={styles.cardAction}>
+                  <span>Explore Service</span>
+                  <div className={styles.actionIcon}>
+                    <ArrowUpRight size={18} />
+                  </div>
+                </div>
               </div>
 
-              <div className={styles.cardTitle}>{srv.title}</div>
-              <div className={styles.cardDesc}>{srv.desc}</div>
-
-              <div className={styles.cardTags}>
-                {srv.tags.map((tag) => (
-                  <span key={tag} className={styles.cardTag}>
-                    {tag}
-                  </span>
-                ))}
-              </div>
-
-              <div className={styles.cardArrow}>
-                <ArrowUpRight size={14} color="#000" />
+              {/* Right Media */}
+              <div className={styles.cardMedia}>
+                <Image
+                  src={service.image}
+                  alt={service.title}
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 45vw"
+                  className={styles.mediaImage}
+                />
+                <div className={styles.mediaOverlay} />
               </div>
             </Link>
           ))}
         </div>
       </div>
     </section>
-  )
+  );
 }

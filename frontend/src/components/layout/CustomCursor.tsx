@@ -1,190 +1,85 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 
 export function CustomCursor() {
-  const dotRef = useRef<HTMLDivElement>(null);
-  const ringRef = useRef<HTMLDivElement>(null);
-
-  const pos = useRef({
-    x: -100,
-    y: -100,
-    rx: -100,
-    ry: -100,
-  });
-
-  const rafRef = useRef<number | null>(null);
-  const [mounted, setMounted] = useState(false);
+  const [pos, setPos] = useState({ x: -100, y: -100 });
+  const [trailingPos, setTrailingPos] = useState({ x: -100, y: -100 });
+  const [isHovered, setIsHovered] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
-  }, []);
+    const handleMouseMove = (e: MouseEvent) => {
+      setPos({ x: e.clientX, y: e.clientY });
+      if (!isVisible) setIsVisible(true);
 
-  useEffect(() => {
-    if (!mounted) return;
-
-    const dot = dotRef.current;
-    const ring = ringRef.current;
-
-    if (!dot || !ring) return;
-
-    // Mouse movement
-    const onMove = (e: MouseEvent) => {
-      pos.current.x = e.clientX;
-      pos.current.y = e.clientY;
-
-      dot.style.left = `${e.clientX}px`;
-      dot.style.top = `${e.clientY}px`;
+      const target = e.target as HTMLElement | null;
+      const isInteractive = Boolean(
+        target?.closest("a, button, [role='button'], input, textarea, select, .cursor-pointer")
+      );
+      setIsHovered(isInteractive);
     };
 
-    // Smooth ring animation
-    const animate = () => {
-      pos.current.rx +=
-        (pos.current.x - pos.current.rx) * 0.11;
+    const handleMouseLeave = () => setIsVisible(false);
+    const handleMouseEnter = () => setIsVisible(true);
 
-      pos.current.ry +=
-        (pos.current.y - pos.current.ry) * 0.11;
-
-      ring.style.left = `${pos.current.rx}px`;
-      ring.style.top = `${pos.current.ry}px`;
-
-      rafRef.current = requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    // Hover effect
-    const onEnter = () => {
-      ring.style.width = "54px";
-      ring.style.height = "54px";
-      ring.style.borderColor = "#DFFF1A";
-      ring.style.opacity = "1";
-    };
-
-    const onLeave = () => {
-      ring.style.width = "36px";
-      ring.style.height = "36px";
-      ring.style.borderColor = "rgba(255,255,255,0.5)";
-      ring.style.opacity = "0.6";
-    };
-
-    // Click effect
-    const onClick = () => {
-      dot.style.transform =
-        "translate(-50%, -50%) scale(2)";
-
-      window.setTimeout(() => {
-        dot.style.transform =
-          "translate(-50%, -50%) scale(1)";
-      }, 150);
-    };
-
-    // Add hover listeners
-    const addHoverListeners = () => {
-      document
-        .querySelectorAll<HTMLElement>(
-          "a, button, [data-hover]"
-        )
-        .forEach((el) => {
-          el.removeEventListener("mouseenter", onEnter);
-          el.removeEventListener("mouseleave", onLeave);
-
-          el.addEventListener("mouseenter", onEnter);
-          el.addEventListener("mouseleave", onLeave);
-        });
-    };
-
-    // Window enter / leave
-    const onLeaveWindow = () => {
-      dot.style.opacity = "0";
-      ring.style.opacity = "0";
-    };
-
-    const onEnterWindow = () => {
-      dot.style.opacity = "1";
-      ring.style.opacity = "0.6";
-    };
-
-    document.addEventListener("mousemove", onMove);
-    document.addEventListener("click", onClick);
-    document.addEventListener("mouseleave", onLeaveWindow);
-    document.addEventListener("mouseenter", onEnterWindow);
-
-    addHoverListeners();
-
-    // Watch dynamically added elements
-    const observer = new MutationObserver(() => {
-      addHoverListeners();
-    });
-
-    observer.observe(document.body, {
-      childList: true,
-      subtree: true,
-    });
+    window.addEventListener("mousemove", handleMouseMove);
+    document.addEventListener("mouseleave", handleMouseLeave);
+    document.addEventListener("mouseenter", handleMouseEnter);
 
     return () => {
-      if (rafRef.current) {
-        cancelAnimationFrame(rafRef.current);
-      }
-
-      document.removeEventListener("mousemove", onMove);
-      document.removeEventListener("click", onClick);
-      document.removeEventListener("mouseleave", onLeaveWindow);
-      document.removeEventListener("mouseenter", onEnterWindow);
-
-      document
-        .querySelectorAll<HTMLElement>(
-          "a, button, [data-hover]"
-        )
-        .forEach((el) => {
-          el.removeEventListener("mouseenter", onEnter);
-          el.removeEventListener("mouseleave", onLeave);
-        });
-
-      observer.disconnect();
+      window.removeEventListener("mousemove", handleMouseMove);
+      document.removeEventListener("mouseleave", handleMouseLeave);
+      document.removeEventListener("mouseenter", handleMouseEnter);
     };
-  }, [mounted]);
+  }, [isVisible]);
 
-  if (!mounted) return null;
+  // Smooth lagging follower
+  useEffect(() => {
+    let animationFrameId: number;
+
+    const followCursor = () => {
+      setTrailingPos((prev) => ({
+        x: prev.x + (pos.x - prev.x) * 0.18,
+        y: prev.y + (pos.y - prev.y) * 0.18,
+      }));
+      animationFrameId = requestAnimationFrame(followCursor);
+    };
+
+    animationFrameId = requestAnimationFrame(followCursor);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [pos]);
+
+  if (!isVisible) return null;
 
   return (
     <>
-      {/* Cursor Dot */}
+      {/* Precision Center Dot */}
       <div
-        ref={dotRef}
+        className="pointer-events-none fixed z-index: 99998 rounded-full background-color: #dfff1a transition-transform duration-75 ease-out"
         style={{
-          position: "fixed",
-          width: "8px",
-          height: "8px",
-          background: "#DFFF1A",
-          borderRadius: "50%",
-          pointerEvents: "none",
-          zIndex: 99999,
-          left: "-100px",
-          top: "-100px",
+          left: `${pos.x}px`,
+          top: `${pos.y}px`,
+          width: isHovered ? "12px" : "6px",
+          height: isHovered ? "12px" : "6px",
           transform: "translate(-50%, -50%)",
-          transition: "transform 0.15s ease",
-          mixBlendMode: "difference",
+          boxShadow: "0 0 12px #dfff1a",
         }}
       />
 
-      {/* Cursor Ring */}
+      {/* Trailing Outer Ring with 3D Aura */}
       <div
-        ref={ringRef}
+        className="pointer-events-none fixed z-index: 99998 rounded-full border transition-all duration-300 ease-out"
         style={{
-          position: "fixed",
-          width: "36px",
-          height: "36px",
-          border: "1.5px solid rgba(255,255,255,0.5)",
-          borderRadius: "50%",
-          pointerEvents: "none",
-          zIndex: 99998,
-          left: "-100px",
-          top: "-100px",
+          left: `${trailingPos.x}px`,
+          top: `${trailingPos.y}px`,
+          width: isHovered ? "56px" : "36px",
+          height: isHovered ? "56px" : "36px",
           transform: "translate(-50%, -50%)",
-          transition:
-            "width 0.25s ease, height 0.25s ease, border-color 0.2s ease, opacity 0.2s ease",
-          opacity: 0.6,
+          borderColor: isHovered ? "rgba(223, 255, 26, 0.8)" : "rgba(255, 255, 255, 0.25)",
+          backgroundColor: isHovered ? "rgba(223, 255, 26, 0.08)" : "transparent",
+          backdropFilter: isHovered ? "blur(2px)" : "none",
+          boxShadow: isHovered ? "0 0 25px rgba(223, 255, 26, 0.2)" : "none",
         }}
       />
     </>

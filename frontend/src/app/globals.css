@@ -1,0 +1,158 @@
+@import "tailwindcss";
+
+@theme {
+  --font-head: 'Syne', sans-serif;
+  --font-body: 'DM Sans', sans-serif;
+
+  --color-primary: #5B4FE8;
+  --color-accent: #E8764F;
+  --color-accent2: #4FD1C5;
+  --color-lime: #DFFF1A;
+
+  --color-bg: #050505;
+  --color-surface: #0A0A0F;
+  --color-text: #FFFFFF;
+  --color-muted: #888899;
+  --color-border: rgba(255, 255, 255, 0.1);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  background: var(--color-bg) !important;
+  color: var(--color-text);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* Scroll Progress Bar */
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 2.5px;
+  background: linear-gradient(
+    90deg,
+    var(--color-primary),
+    var(--color-accent2)
+  );
+  z-index: 2000;
+  transition: width 0.1s linear;
+}
+
+/* Custom Cursor */
+* {
+  cursor: none !important;
+}
+
+a,
+button,
+[data-hover] {
+  cursor: none !important;
+}
+
+/* Blink */
+.blink {
+  animation: blink 2s ease-in-out infinite;
+}
+
+@keyframes blink {
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.3;
+  }
+}
+
+/* Logo Pulse */
+@keyframes logoPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(91, 79, 232, 0.4);
+  }
+
+  50% {
+    box-shadow: 0 0 0 8px rgba(91, 79, 232, 0);
+  }
+}
+
+.logo-pulse {
+  animation: logoPulse 3s ease-in-out infinite;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--color-bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--color-lime);
+  border-radius: 10px;
+}
+
+/* Service Item Hover */
+.service-link-item:hover {
+  background: rgba(223, 255, 26, 0.05) !important;
+  color: var(--color-lime) !important;
+  padding-left: 10px !important;
+  transition: all 0.3s ease;
+}
+
+/* Reveal Animation */
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition: all 0.8s ease-out;
+}
+
+.reveal.active {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* Footer Background Text */
+.footer-bg-text {
+  font-family: var(--font-head);
+  font-size: clamp(52px, 10vw, 110px);
+  font-weight: 800;
+  color: transparent;
+  -webkit-text-stroke: 1px var(--color-border);
+  letter-spacing: -4px;
+  line-height: 1;
+  user-select: none;
+  transition: all 0.4s;
+}
+
+.footer-bg-text:hover {
+  -webkit-text-stroke-color: rgba(91, 79, 232, 0.2);
+}
+
+/* Cursor disabled on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  * {
+    cursor: auto !important;
+  }
+
+  a,
+  button,
+  [data-hover] {
+    cursor: pointer !important;
+  }
+}

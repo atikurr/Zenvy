@@ -1,5 +1,6 @@
 "use client";
-import { useEffect, useRef } from "react";
+
+import React, { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 import { ArrowRight, ArrowUpRight } from "lucide-react";
 import Link from "next/link";
@@ -14,43 +15,56 @@ export function HeroSection() {
   const rightRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    // মোবাইল ও ট্যাবলেটে ডান পাশের কার্ডে x শিফট ওভারফ্লো বন্ধ করার চেক
+    const isSmallScreen = window.innerWidth < 1024;
+
     const tl = gsap.timeline({ delay: 0.3 });
 
     tl.fromTo(
       eyebrowRef.current,
       { y: 20, opacity: 0 },
-      { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" },
+      { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }
     )
       .fromTo(
         headlineRef.current,
         { y: 60, opacity: 0 },
         { y: 0, opacity: 1, duration: 1, ease: "power4.out" },
-        "-=0.3",
+        "-=0.3"
       )
       .fromTo(
         subRef.current,
         { y: 30, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.7, ease: "power3.out" },
-        "-=0.5",
+        "-=0.5"
       )
       .fromTo(
         statsRef.current,
         { y: 25, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" },
-        "-=0.4",
+        "-=0.4"
       )
       .fromTo(
         ctaRef.current,
         { y: 20, opacity: 0 },
         { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" },
-        "-=0.3",
+        "-=0.3"
       )
       .fromTo(
         rightRef.current,
-        { x: 60, opacity: 0 },
-        { x: 0, opacity: 1, duration: 1, ease: "expo.out" },
-        "-=1",
+        {
+          x: isSmallScreen ? 0 : 60,
+          y: isSmallScreen ? 35 : 0,
+          opacity: 0,
+        },
+        { x: 0, y: 0, opacity: 1, duration: 1, ease: "expo.out" },
+        "-=1"
       );
+
+    return () => {
+      tl.kill();
+    };
   }, []);
 
   return (
@@ -69,8 +83,8 @@ export function HeroSection() {
 
           {/* Headline */}
           <h1 ref={headlineRef} className={styles.headline}>
-            We Build Digital <br />
-            Experiences That <br />
+            We Build Digital <br className={styles.desktopBreak} />
+            Experiences That <br className={styles.desktopBreak} />
             Drive Real Growth.
           </h1>
 
@@ -120,7 +134,7 @@ export function HeroSection() {
             </div>
 
             <h3 className={styles.cardTitle}>
-              Your Trusted Digital <br /> Agency Partner
+              Your Trusted Digital <br className={styles.desktopBreak} /> Agency Partner
             </h3>
             <p className={styles.cardSub}>
               From strategy to execution, we turn ideas into measurable results.

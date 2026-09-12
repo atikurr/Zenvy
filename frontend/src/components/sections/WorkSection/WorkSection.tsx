@@ -6,6 +6,7 @@ import Image from "next/image";
 import { Plus, ArrowUpRight } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import styles from "./WorkSection.module.css";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
@@ -21,20 +22,6 @@ export type Project = {
   link?: string;
   slug?: string;
 };
-
-interface ApiProjectItem {
-  _id?: string;
-  id?: string;
-  title?: string;
-  category?: string;
-  subtitle?: string;
-  description?: string;
-  tags?: string[];
-  coverImage?: string;
-  image?: string;
-  slug?: string;
-  link?: string;
-}
 
 const fallbackProjects: Project[] = [
   {
@@ -72,7 +59,7 @@ const fallbackProjects: Project[] = [
     title: "Haj Tafweej",
     subtitle: "Smart Pilgrim Management",
     description:
-      "A large-scale government-backed logistics platform simplifying crowd safety, transportation, and operations during peak seasons.",
+      "A large-scale logistics platform simplifying crowd safety, transportation, and operations during peak seasons.",
     tags: ["Enterprise SaaS", "Data Visualization", "Full-Stack Web"],
     image: "/Images/services/seo.jpg",
     link: "/work",
@@ -82,7 +69,7 @@ const fallbackProjects: Project[] = [
     title: "Prime Iraq",
     subtitle: "Digital Banking Core",
     description:
-      "High-security financial mobile banking app crafted to modernize transaction flow and multi-currency digital wallets.",
+      "High-security financial mobile banking app crafted to modernize transaction flow and multi-currency wallets.",
     tags: ["Fintech", "App Design", "Interaction Systems"],
     image: "/Images/services/digital-marketing.jpg",
     link: "/work",
@@ -92,7 +79,7 @@ const fallbackProjects: Project[] = [
     title: "Panther Security",
     subtitle: "Cloud Threat Analytics",
     description:
-      "Real-time cyber defense workspace transforming massive enterprise system log data into immediate threat intelligence.",
+      "Real-time cyber defense workspace transforming massive enterprise log data into immediate threat intelligence.",
     tags: ["Cyber Security", "UI Engineering", "Design System"],
     image: "/Images/services/web-design.jpg",
     link: "/work",
@@ -111,17 +98,14 @@ export function WorkSection() {
   useEffect(() => {
     async function loadProjects() {
       try {
-        const res = await fetch(`${API_URL}/api/projects`, {
-          cache: "no-store",
-        });
+        const res = await fetch(`${API_URL}/api/projects`, { cache: "no-store" });
         if (!res.ok) return;
-
         const data = await res.json();
-        const list: ApiProjectItem[] = Array.isArray(data) ? data : data?.data;
+        const list = Array.isArray(data) ? data : data?.data;
 
         if (list && list.length > 0) {
           setProjects(
-            list.map((item: ApiProjectItem, idx: number) => ({
+            list.map((item: any, idx: number) => ({
               id: item._id || item.id || String(idx + 1),
               title: item.title || "Untitled Project",
               subtitle: item.category || item.subtitle || "Case Study",
@@ -133,7 +117,7 @@ export function WorkSection() {
           );
         }
       } catch {
-        // Fallback data remains active if API is unavailable
+        // Fallback active
       }
     }
 
@@ -142,14 +126,16 @@ export function WorkSection() {
 
   useEffect(() => {
     if (typeof window === "undefined" || projects.length === 0) return;
+    const isMobile = window.innerWidth < 768;
 
     const ctx = gsap.context(() => {
+      // ১ম প্রজেক্ট সার্কেল রিভিল অ্যানিমেশন
       if (firstCardRef.current && firstImageRef.current) {
         const tl = gsap.timeline({
           scrollTrigger: {
             trigger: firstCardRef.current,
-            start: "top 85%",
-            end: "top 25%",
+            start: isMobile ? "top 90%" : "top 85%",
+            end: isMobile ? "top 45%" : "top 25%",
             scrub: 1.2,
           },
         });
@@ -157,9 +143,9 @@ export function WorkSection() {
         tl.fromTo(
           firstCardRef.current,
           {
-            clipPath: "circle(12% at 50% 50%)",
-            scale: 0.88,
-            filter: "brightness(0.7)",
+            clipPath: isMobile ? "circle(20% at 50% 50%)" : "circle(12% at 50% 50%)",
+            scale: 0.94,
+            filter: "brightness(0.8)",
           },
           {
             clipPath: "circle(100% at 50% 50%)",
@@ -170,33 +156,32 @@ export function WorkSection() {
           0
         ).fromTo(
           firstImageRef.current,
-          { scale: 1.3 },
+          { scale: 1.2 },
           { scale: 1, ease: "power2.out" },
           0
         );
       }
 
+      // বাকি কার্ডগুলোর স্ক্রল ফেড ও লিফট
       cardsRef.current.slice(1).forEach((card) => {
         if (!card) return;
 
         gsap.fromTo(
           card,
           {
-            y: 80,
+            y: isMobile ? 35 : 70,
             opacity: 0,
-            rotateX: 8,
-            scale: 0.96,
+            scale: isMobile ? 0.98 : 0.96,
           },
           {
             y: 0,
             opacity: 1,
-            rotateX: 0,
             scale: 1,
             ease: "power3.out",
             scrollTrigger: {
               trigger: card,
-              start: "top 90%",
-              end: "top 65%",
+              start: "top 95%",
+              end: isMobile ? "top 82%" : "top 65%",
               scrub: 1,
             },
           }
@@ -207,7 +192,9 @@ export function WorkSection() {
     return () => ctx.revert();
   }, [projects]);
 
+  // মাউস হোভার ৩ডি টিল্ট (শুধু মাউস ডিভাইসের জন্য)
   const handleCardMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (typeof window !== "undefined" && window.innerWidth < 1024) return;
     const card = e.currentTarget;
     const rect = card.getBoundingClientRect();
     const x = e.clientX - rect.left - rect.width / 2;
@@ -223,6 +210,7 @@ export function WorkSection() {
   };
 
   const handleCardMouseLeave = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (typeof window !== "undefined" && window.innerWidth < 1024) return;
     gsap.to(e.currentTarget, {
       rotateY: 0,
       rotateX: 0,
@@ -232,35 +220,31 @@ export function WorkSection() {
   };
 
   return (
-    <section
-      ref={sectionRef}
-      id="work"
-      className="w-full py-32 bg-[#050505] text-white relative overflow-hidden flex flex-col items-center"
-    >
-      <div className="absolute top-1/4 right-0 w-[600px] h-[600px] bg-[#dfff1a]/5 rounded-full blur-[160px] pointer-events-none" />
+    <section ref={sectionRef} id="work" className={styles.section}>
+      <div className={styles.ambientGlow} />
 
-      <div className="w-full max-w-6xl mx-auto px-6 sm:px-8 relative z-10">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-20">
+      <div className={styles.inner}>
+        {/* Section Header */}
+        <div className={styles.header}>
           <div>
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#dfff1a]/10 border border-[#dfff1a]/20 text-[#dfff1a] text-xs font-bold tracking-wider uppercase mb-4">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#dfff1a] shadow-[0_0_8px_#dfff1a]" />
+            <div className={styles.eyebrow}>
+              <span className={styles.eyebrowDot} />
               Selected Portfolio
             </div>
-            <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white leading-tight">
-              Featured Digital <span className="text-[#dfff1a]">Masterpieces.</span>
+            <h2 className={styles.heading}>
+              Featured Digital <br className={styles.desktopBreak} />
+              <span>Masterpieces.</span>
             </h2>
           </div>
 
-          <Link
-            href="/work"
-            className="inline-flex items-center gap-2 text-sm font-semibold text-neutral-300 hover:text-[#dfff1a] transition-colors whitespace-nowrap"
-          >
+          <Link href="/work" className={styles.viewAll}>
             Explore All Case Studies
-            <ArrowUpRight size={18} />
+            <ArrowUpRight size={16} />
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-20">
+        {/* Dynamic Asymmetric Grid */}
+        <div className={styles.grid}>
           {projects.map((project, index) => {
             const isFull = index % 3 === 0;
             const isFirst = index === 0;
@@ -272,21 +256,14 @@ export function WorkSection() {
                 ref={(el) => {
                   cardsRef.current[index] = el;
                 }}
-                className={`group flex flex-col gap-5 text-inherit no-underline ${
-                  isFull ? "md:col-span-2" : "col-span-1"
-                }`}
+                className={`${styles.projectCard} ${isFull ? styles.fullCard : ""}`}
               >
+                {/* Visual Card Frame */}
                 <div
                   ref={isFirst ? firstCardRef : undefined}
                   onMouseMove={handleCardMouseMove}
                   onMouseLeave={handleCardMouseLeave}
-                  className={`relative w-full rounded-[28px] bg-[#0d0d12] border border-white/10 overflow-hidden transition-colors duration-500 group-hover:border-[#dfff1a]/50 group-hover:shadow-[0_25px_70px_rgba(0,0,0,0.85),0_0_35px_rgba(223,255,26,0.15)] ${
-                    isFull ? "h-[450px] sm:h-[520px] md:h-[600px]" : "h-[380px] sm:h-[450px]"
-                  }`}
-                  style={{
-                    willChange: isFirst ? "clip-path, transform, filter" : "transform",
-                    transformStyle: "preserve-3d",
-                  }}
+                  className={`${styles.cardFrame} ${isFull ? styles.fullCardFrame : ""}`}
                 >
                   <Image
                     ref={isFirst ? firstImageRef : undefined}
@@ -295,43 +272,35 @@ export function WorkSection() {
                     fill
                     priority={isFirst}
                     sizes={isFull ? "100vw" : "(max-width: 1024px) 100vw, 50vw"}
-                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
+                    className={styles.cardImage}
                   />
 
                   {project.subtitle && (
-                    <div className="absolute top-6 left-6 z-10 px-3.5 py-1 rounded-full bg-black/60 backdrop-blur-md border border-white/10 text-xs font-semibold text-neutral-300 tracking-wide">
+                    <div className={styles.badge}>
                       {project.subtitle}
                     </div>
                   )}
 
-                  <div className="absolute right-6 bottom-6 w-14 h-14 rounded-full bg-black/60 backdrop-blur-md border border-white/20 flex items-center justify-center text-white transition-all duration-500 group-hover:bg-[#dfff1a] group-hover:text-black group-hover:border-[#dfff1a] group-hover:rotate-45 group-hover:scale-110 group-hover:shadow-[0_0_25px_rgba(223,255,26,0.6)]">
-                    <Plus size={22} strokeWidth={2.5} />
+                  <div className={styles.plusButton}>
+                    <Plus size={18} strokeWidth={2.5} />
                   </div>
                 </div>
 
-                <div className="flex flex-col gap-2 px-1">
-                  <div className="flex items-baseline gap-3">
-                    <h3 className="text-2xl sm:text-3xl font-extrabold text-white group-hover:text-[#dfff1a] transition-colors duration-300">
-                      {project.title}
-                    </h3>
+                {/* Project Details */}
+                <div className={styles.details}>
+                  <div className={styles.titleRow}>
+                    <h3 className={styles.title}>{project.title}</h3>
                     {project.subtitle && (
-                      <span className="text-sm font-semibold text-neutral-500">
-                        — {project.subtitle}
-                      </span>
+                      <span className={styles.subtitle}>— {project.subtitle}</span>
                     )}
                   </div>
 
-                  <p className="text-sm text-neutral-400 max-w-2xl leading-relaxed">
-                    {project.description}
-                  </p>
+                  <p className={styles.description}>{project.description}</p>
 
                   {project.tags && project.tags.length > 0 && (
-                    <div className="flex flex-wrap gap-2 mt-2">
+                    <div className={styles.tagWrap}>
                       {project.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-3.5 py-1 rounded-full bg-white/[0.03] border border-white/10 text-xs font-medium text-neutral-300 transition-colors group-hover:border-[#dfff1a]/30"
-                        >
+                        <span key={tag} className={styles.tag}>
                           {tag}
                         </span>
                       ))}

@@ -1,37 +1,52 @@
-/* frontend/src/components/sections/WorkSection/WorkSection.module.css */
+/* =========================================================
+   WORK SECTION - RESPONSIVE STYLES
+========================================================= */
 
 .section {
   width: 100%;
-  padding: 112px 0 140px;
+  padding: 80px 0 100px;
   background-color: #050505;
   color: #ffffff;
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+@media (min-width: 768px) {
+  .section {
+    padding: 110px 0 130px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section {
+    padding: 130px 0 150px;
+  }
 }
 
 .ambientGlow {
   position: absolute;
   top: 25%;
   right: 0;
-  width: 500px;
-  height: 500px;
+  width: min(600px, 90vw);
+  height: min(600px, 90vw);
   background: radial-gradient(circle, rgba(223, 255, 26, 0.05) 0%, transparent 70%);
   filter: blur(140px);
   pointer-events: none;
 }
 
-.container {
-  width: 100%;
-  max-width: 1280px;
+.inner {
+  width: min(1200px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 0 24px;
   position: relative;
   z-index: 10;
 }
 
-@media (min-width: 640px) {
-  .container {
-    padding: 0 32px;
+@media (min-width: 768px) {
+  .inner {
+    width: min(1200px, calc(100% - 48px));
   }
 }
 
@@ -39,16 +54,17 @@
 .header {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 24px;
-  margin-bottom: 64px;
+  gap: 20px;
+  margin-bottom: 48px;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 640px) {
   .header {
     flex-direction: row;
     align-items: flex-end;
+    justify-content: space-between;
+    gap: 32px;
+    margin-bottom: 64px;
   }
 }
 
@@ -56,83 +72,97 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 4px 14px;
-  border-radius: 9999px;
-  background-color: rgba(223, 255, 26, 0.1);
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: rgba(223, 255, 26, 0.08);
   border: 1px solid rgba(223, 255, 26, 0.2);
   color: #dfff1a;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  margin-bottom: 16px;
+  margin-bottom: 14px;
 }
 
 .eyebrowDot {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background-color: #dfff1a;
+  background: #dfff1a;
   box-shadow: 0 0 8px #dfff1a;
 }
 
 .heading {
-  font-size: clamp(32px, 4vw, 56px);
+  margin: 0;
+  font-size: clamp(30px, 5vw, 56px);
   font-weight: 800;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
   line-height: 1.15;
   color: #ffffff;
-  margin: 0;
 }
 
 .heading span {
   color: #dfff1a;
 }
 
+.desktopBreak {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .desktopBreak {
+    display: block;
+  }
+}
+
 .viewAll {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
-  font-size: 14px;
+  gap: 6px;
+  font-size: 13px;
   font-weight: 600;
   color: #d4d4d8;
   text-decoration: none;
+  transition: color 0.2s ease, gap 0.2s ease;
   white-space: nowrap;
-  transition: color 0.2s ease;
 }
 
 .viewAll:hover {
   color: #dfff1a;
+  gap: 9px;
 }
 
-/* Asymmetric Grid (1 Full -> 2 Split -> 1 Full) */
+/* Grid Layout */
 .grid {
   display: grid;
   grid-template-columns: 1fr;
-  column-gap: 32px;
-  row-gap: 64px;
+  gap: 40px;
 }
 
 @media (min-width: 768px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
+    gap: 48px 32px;
   }
 }
 
-.cardLink {
+@media (min-width: 1024px) {
+  .grid {
+    gap: 70px 40px;
+  }
+}
+
+.projectCard {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 16px;
   text-decoration: none;
   color: inherit;
 }
 
 @media (min-width: 768px) {
-  .fullWidth {
+  .fullCard {
     grid-column: span 2;
-  }
-  .halfWidth {
-    grid-column: span 1;
   }
 }
 
@@ -140,52 +170,86 @@
 .cardFrame {
   position: relative;
   width: 100%;
-  border-radius: 24px;
+  aspect-ratio: 16 / 10;
+  border-radius: 20px;
   background-color: #0d0d12;
   border: 1px solid rgba(255, 255, 255, 0.1);
   overflow: hidden;
   transition: border-color 0.4s ease, box-shadow 0.4s ease;
+  transform-style: preserve-3d;
 }
 
-.fullWidth .cardFrame {
-  aspect-ratio: 16 / 8.5;
-  max-height: 620px;
+@media (min-width: 768px) {
+  .cardFrame {
+    border-radius: 26px;
+  }
+
+  .fullCardFrame {
+    aspect-ratio: 16 / 9;
+    max-height: 560px;
+  }
 }
 
-.halfWidth .cardFrame {
-  aspect-ratio: 16 / 11;
-  max-height: 480px;
-}
+@media (hover: hover) and (pointer: fine) {
+  .projectCard:hover .cardFrame {
+    border-color: rgba(223, 255, 26, 0.45);
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 25px rgba(223, 255, 26, 0.12);
+  }
 
-.cardLink:hover .cardFrame {
-  border-color: rgba(223, 255, 26, 0.4);
-  box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 30px rgba(223, 255, 26, 0.1);
-}
+  .projectCard:hover .cardImage {
+    transform: scale(1.05);
+  }
 
-/* 1st Project Cinematic Circle Mask */
-.circleMask {
-  clip-path: circle(18% at 50% 50%);
-  will-change: clip-path, transform, opacity;
+  .projectCard:hover .title {
+    color: #dfff1a;
+  }
+
+  .projectCard:hover .plusButton {
+    background: #dfff1a;
+    color: #000000;
+    border-color: #dfff1a;
+    transform: rotate(45deg) scale(1.05);
+    box-shadow: 0 0 20px rgba(223, 255, 26, 0.5);
+  }
 }
 
 .cardImage {
   object-fit: cover;
-  transition: transform 0.7s cubic-bezier(0.2, 1, 0.3, 1);
+  transition: transform 0.6s cubic-bezier(0.2, 1, 0.3, 1);
 }
 
-.cardLink:hover .cardImage {
-  transform: scale(1.05);
-}
-
-/* Floating Action Button (+) */
-.actionBtn {
+.badge {
   position: absolute;
-  right: 24px;
-  bottom: 24px;
-  width: 48px;
-  height: 48px;
+  top: 14px;
+  left: 14px;
+  z-index: 10;
+  padding: 4px 12px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 11px;
+  font-weight: 600;
+  color: #d4d4d8;
+}
+
+@media (min-width: 640px) {
+  .badge {
+    top: 20px;
+    left: 20px;
+    font-size: 12px;
+  }
+}
+
+.plusButton {
+  position: absolute;
+  right: 14px;
+  bottom: 14px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
-  background-color: rgba(0, 0, 0, 0.6);
+  background: rgba(0, 0, 0, 0.7);
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
   border: 1px solid rgba(255, 255, 255, 0.2);
@@ -193,75 +257,67 @@
   align-items: center;
   justify-content: center;
   color: #ffffff;
-  transition: all 0.3s cubic-bezier(0.2, 1, 0.3, 1);
+  transition: all 0.35s ease;
 }
 
-.cardLink:hover .actionBtn {
-  background-color: #dfff1a;
-  color: #000000;
-  border-color: #dfff1a;
-  transform: rotate(45deg) scale(1.05);
-  box-shadow: 0 0 20px rgba(223, 255, 26, 0.4);
+@media (min-width: 640px) {
+  .plusButton {
+    right: 20px;
+    bottom: 20px;
+    width: 48px;
+    height: 48px;
+  }
 }
 
-/* Card Content / Meta */
-.meta {
+/* Details Section */
+.details {
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  padding: 0 4px;
+  gap: 8px;
 }
 
 .titleRow {
   display: flex;
+  flex-wrap: wrap;
   align-items: baseline;
-  gap: 12px;
+  gap: 8px;
 }
 
-.projectTitle {
-  font-size: clamp(22px, 2vw, 30px);
+.title {
+  margin: 0;
+  font-size: clamp(20px, 2.5vw, 28px);
   font-weight: 800;
   color: #ffffff;
-  margin: 0;
-  transition: color 0.2s ease;
-}
-
-.cardLink:hover .projectTitle {
-  color: #dfff1a;
+  transition: color 0.3s ease;
 }
 
 .subtitle {
-  font-size: 14px;
+  font-size: 12px;
   font-weight: 600;
   color: #71717a;
 }
 
 .description {
-  font-size: 14px;
-  line-height: 1.6;
-  color: #a1a1aa;
-  max-width: 680px;
   margin: 0;
+  font-size: clamp(12px, 1.3vw, 14px);
+  color: #a1a1aa;
+  line-height: 1.6;
+  max-width: 640px;
 }
 
-.tags {
+.tagWrap {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 6px;
   margin-top: 4px;
 }
 
 .tag {
-  padding: 4px 14px;
-  border-radius: 9999px;
-  background-color: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 11px;
   font-weight: 500;
   color: #d4d4d8;
-  transition: border-color 0.2s ease;
-}
-
-.cardLink:hover .tag {
-  border-color: rgba(223, 255, 26, 0.3);
 }

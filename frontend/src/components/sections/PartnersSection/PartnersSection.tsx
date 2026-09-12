@@ -63,8 +63,8 @@ export function PartnersSection() {
             </div>
           </div>
 
-          {/* Row 3: Leftward (Faster) */}
-          <div className={styles.marqueeRow}>
+          {/* Row 3: Leftward (Desktop & Large Tablet Only) */}
+          <div className={`${styles.marqueeRow} ${styles.desktopOnlyRow}`}>
             <div className={styles.marqueeTrackFast}>
               {[...row3, ...row3, ...row3].map((name, i) => (
                 <div key={`r3-${i}`} className={styles.partnerCard}>

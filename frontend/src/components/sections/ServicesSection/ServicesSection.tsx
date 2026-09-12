@@ -8,7 +8,9 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import styles from "./ServicesSection.module.css";
 
-gsap.registerPlugin(ScrollTrigger);
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
 
 const services = [
   {
@@ -78,24 +80,29 @@ export function ServicesSection() {
   const cardsRef = useRef<(HTMLAnchorElement | null)[]>([]);
 
   useEffect(() => {
+    if (typeof window === "undefined") return;
     const cards = cardsRef.current.filter(Boolean);
     if (!cards.length) return;
 
+    const isMobile = window.innerWidth < 768;
+
     const ctx = gsap.context(() => {
       cards.forEach((card, index) => {
-        if (index === cards.length - 1) return; // শেষ কার্ড স্কেল করার প্রয়োজন নেই
+        if (index === cards.length - 1 || !card) return;
 
         const nextCard = cards[index + 1];
+        if (!nextCard) return;
 
         gsap.to(card, {
-          scale: 0.9,
-          opacity: 0.35,
-          filter: "blur(4px)",
+          scale: isMobile ? 0.94 : 0.9,
+          opacity: isMobile ? 0.45 : 0.35,
+          
+          filter: isMobile ? "none" : "blur(4px)",
           ease: "power2.out",
           scrollTrigger: {
             trigger: nextCard,
-            start: "top 80%",
-            end: "top 25%",
+            start: isMobile ? "top 85%" : "top 80%",
+            end: isMobile ? "top 35%" : "top 25%",
             scrub: 0.5,
           },
         });
@@ -147,6 +154,8 @@ export function ServicesSection() {
               className={styles.stickyCard}
               style={{
                 zIndex: index + 1,
+                
+                top: `calc(90px + ${index * 12}px)`,
               }}
             >
               {/* Left Content */}
@@ -184,7 +193,7 @@ export function ServicesSection() {
                   src={service.image}
                   alt={service.title}
                   fill
-                  sizes="(max-width: 1024px) 100vw, 45vw"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 45vw"
                   className={styles.mediaImage}
                 />
                 <div className={styles.mediaOverlay} />

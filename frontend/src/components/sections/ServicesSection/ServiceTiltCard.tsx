@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
@@ -24,9 +24,19 @@ export function ServiceTiltCard({
 }) {
   const cardRef = useRef<HTMLAnchorElement>(null);
   const [spotlight, setSpotlight] = useState({ x: 0, y: 0, opacity: 0 });
+  const [isTouchDevice, setIsTouchDevice] = useState(false);
+
+  useEffect(() => {
+    // টাচ ডিভাইস চেক যাতে ফোনে পারফরম্যান্স ল্যাগ না করে
+    setIsTouchDevice(
+      "ontouchstart" in window || navigator.maxTouchPoints > 0
+    );
+  }, []);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    if (!cardRef.current) return;
+    // মোবাইল বা টাচ স্ক্রিনে ৩ডি টিল্ট বন্ধ থাকবে
+    if (isTouchDevice || !cardRef.current) return;
+
     const rect = cardRef.current.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
@@ -34,16 +44,17 @@ export function ServiceTiltCard({
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
 
-    const rotateX = ((y - centerY) / centerY) * -8;
-    const rotateY = ((x - centerX) / centerX) * 8;
+    const rotateX = ((y - centerY) / centerY) * -7;
+    const rotateY = ((x - centerX) / centerX) * 7;
 
     cardRef.current.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
     setSpotlight({ x, y, opacity: 1 });
   };
 
   const handleMouseLeave = () => {
-    if (!cardRef.current) return;
-    cardRef.current.style.transform = "perspective(1000px) rotateX(0deg) rotateY(0deg)";
+    if (isTouchDevice || !cardRef.current) return;
+    cardRef.current.style.transform =
+      "perspective(1000px) rotateX(0deg) rotateY(0deg)";
     setSpotlight((prev) => ({ ...prev, opacity: 0 }));
   };
 
@@ -58,18 +69,20 @@ export function ServiceTiltCard({
         transformStyle: "preserve-3d",
       }}
     >
-      {/* 3D Cursor Spotlight */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          pointerEvents: "none",
-          zIndex: 12,
-          opacity: spotlight.opacity,
-          background: `radial-gradient(350px circle at ${spotlight.x}px ${spotlight.y}px, rgba(223, 255, 26, 0.18), transparent 70%)`,
-          transition: "opacity 0.25s ease",
-        }}
-      />
+      {/* 3D Cursor Spotlight (Desktop Only) */}
+      {!isTouchDevice && (
+        <div
+          style={{
+            position: "absolute",
+            inset: 0,
+            pointerEvents: "none",
+            zIndex: 12,
+            opacity: spotlight.opacity,
+            background: `radial-gradient(350px circle at ${spotlight.x}px ${spotlight.y}px, rgba(223, 255, 26, 0.18), transparent 70%)`,
+            transition: "opacity 0.25s ease",
+          }}
+        />
+      )}
 
       {/* Background Image Layer */}
       <div className={styles.imageWrap}>
@@ -77,7 +90,7 @@ export function ServiceTiltCard({
           src={image}
           alt={service.title}
           fill
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           className={styles.image}
         />
         <div className={styles.imageGradient} />
@@ -96,7 +109,7 @@ export function ServiceTiltCard({
         </div>
       </div>
 
-      {/* Unique Hover Reveal Drawer: Shows details seamlessly on mouse hover */}
+      {/* Unique Hover Reveal Drawer */}
       <div className={styles.hoverDrawer}>
         <h3 className={styles.drawerTitle}>{service.title}</h3>
         <p className={styles.drawerDesc}>{service.description}</p>

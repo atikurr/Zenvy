@@ -13,7 +13,6 @@ if (typeof window !== "undefined") {
 }
 
 interface VideoShowcaseProps {
-  // অ্যাডমিন প্যানেল থেকে আসা ভিডিও URL (S3 ডিরেক্ট mp4 অথবা YouTube লিংক)
   videoUrl?: string;
   posterImage?: string;
 }
@@ -24,16 +23,13 @@ export function VideoShowcaseSection({
 }: VideoShowcaseProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const videoCardRef = useRef<HTMLDivElement>(null);
+  const badgeRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // ডেমো ফলব্যাক: অ্যাডমিন থেকে কিছু না আসলে ডিফল্ট ইউটিউব ডেমো
   const activeVideoUrl = videoUrl || "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
-
-  // ভিডিও ফরম্যাট যাচাই (ডিরেক্ট আপলোডেড ফাইল নাকি ইউটিউব লিংক)
   const isDirectVideoFile = /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(activeVideoUrl);
 
-  // ইউটিউব লিংক হলে এমবেড URL ফরম্যাটে রূপান্তর
   const getEmbedUrl = (url: string) => {
     if (url.includes("youtube.com/watch?v=")) {
       const id = url.split("v=")[1]?.split("&")[0];
@@ -56,15 +52,16 @@ export function VideoShowcaseSection({
     const ctx = gsap.context(() => {
       if (isDesktop && videoCardRef.current && contentRef.current) {
         const card = videoCardRef.current;
-        const rect = card.getBoundingClientRect();
-        const vw = window.innerWidth;
-        const vh = window.innerHeight;
-
-        const cardCenterX = rect.left + rect.width / 2;
-        const cardCenterY = rect.top + rect.height / 2;
-        const startX = vw / 2 - cardCenterX;
-        const startY = vh / 2 - cardCenterY;
-        const startScale = Math.max(vw / rect.width, vh / rect.height);
+        const cardRect = card.getBoundingClientRect();
+        
+        // স্ক্রিনের হরাইজন্টাল সেন্টার থেকে কার্ডের দূরত্ব
+        const startX = window.innerWidth / 2 - (cardRect.left + cardRect.width / 2);
+        
+        // ফুলস্ক্রিন কাভার করার জন্য প্রয়োজনীয় স্কেল
+        const startScale = Math.max(
+          window.innerWidth / cardRect.width,
+          window.innerHeight / cardRect.height
+        );
 
         const tl = gsap.timeline({
           scrollTrigger: {
@@ -77,11 +74,12 @@ export function VideoShowcaseSection({
           },
         });
 
+        // ১. ফুলস্ক্রিন সেন্টার থেকে স্মুথলি বামে ডক হবে
         tl.fromTo(
           card,
           {
             x: startX,
-            y: startY,
+            y: 0,
             scale: startScale,
             borderRadius: "0px",
           },
@@ -93,7 +91,21 @@ export function VideoShowcaseSection({
             ease: "power2.out",
           },
           0
-        ).fromTo(
+        )
+        // ২. কার্ড স্কেল হওয়ার সময় ব্যাজটির সাইজ একই রকম নিখুঁত থাকবে
+        .fromTo(
+          badgeRef.current,
+          {
+            scale: 1 / startScale,
+          },
+          {
+            scale: 1,
+            ease: "power2.out",
+          },
+          0
+        )
+        // ৩. ডানের কনটেন্ট স্ট্যাগার হয়ে ভেসে উঠবে
+        .fromTo(
           contentRef.current.children,
           {
             opacity: 0,
@@ -105,7 +117,40 @@ export function VideoShowcaseSection({
             stagger: 0.05,
             ease: "power2.out",
           },
-          0.25
+          0.2
+        );
+      } else if (!isDesktop && videoCardRef.current && contentRef.current) {
+        // মোবাইল ও ট্যাবলেট ট্রানজিশন
+        gsap.fromTo(
+          videoCardRef.current,
+          { scale: 1.08, opacity: 0.9 },
+          {
+            scale: 1,
+            opacity: 1,
+            ease: "power1.out",
+            scrollTrigger: {
+              trigger: videoCardRef.current,
+              start: "top 85%",
+              end: "top 35%",
+              scrub: 0.8,
+            },
+          }
+        );
+
+        gsap.fromTo(
+          contentRef.current.children,
+          { opacity: 0, y: 25 },
+          {
+            opacity: 1,
+            y: 0,
+            stagger: 0.06,
+            duration: 0.6,
+            ease: "power2.out",
+            scrollTrigger: {
+              trigger: contentRef.current,
+              start: "top 80%",
+            },
+          }
         );
       }
     }, containerRef);
@@ -134,7 +179,8 @@ export function VideoShowcaseSection({
               />
               <div className={styles.overlay} />
 
-              <div className={styles.badgeWrapper}>
+              {/* Play Now বাটন সবসময় কার্ডের সেন্টারে থাকবে */}
+              <div ref={badgeRef} className={styles.badgeWrapper}>
                 <div className={styles.rotatingDisc}>
                   <svg viewBox="0 0 100 100" className={styles.discSvg}>
                     <path
@@ -173,10 +219,10 @@ export function VideoShowcaseSection({
               powering ambitious ventures.
             </p>
 
-            <Link href="/about" className={styles.primaryBtn} prefetch={true}>
-  More About Us
-  <ArrowUpRight size={17} strokeWidth={2.5} />
-</Link>
+            <Link href="/about" className={styles.primaryBtn}>
+              More About Us
+              <ArrowUpRight size={17} strokeWidth={2.5} />
+            </Link>
 
             <div className={styles.testimonialBox}>
               <p className={styles.quoteText}>
@@ -205,7 +251,7 @@ export function VideoShowcaseSection({
         </div>
       </section>
 
-      {/* ── ON-PAGE VIDEO MODAL (NO REDIRECT) ── */}
+      {/* ── ON-PAGE VIDEO MODAL ── */}
       {isPlaying && (
         <div className={styles.modalOverlay} onClick={() => setIsPlaying(false)}>
           <button
@@ -217,7 +263,6 @@ export function VideoShowcaseSection({
           </button>
           <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
             {isDirectVideoFile ? (
-              
               <video
                 src={activeVideoUrl}
                 controls
@@ -225,7 +270,6 @@ export function VideoShowcaseSection({
                 className={styles.iframe}
               />
             ) : (
-              
               <iframe
                 src={getEmbedUrl(activeVideoUrl)}
                 title="Agency Brand Showcase"

@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Play, X, ArrowUpRight } from "lucide-react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -21,21 +22,20 @@ export function VideoShowcaseSection({
   videoUrl,
   posterImage = "/Images/services/brand-design.png",
 }: VideoShowcaseProps) {
+  const router = useRouter();
   const containerRef = useRef<HTMLDivElement>(null);
   const videoCardRef = useRef<HTMLDivElement>(null);
   const badgeRef = useRef<HTMLDivElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // আপনার দেওয়া কাঙ্ক্ষিত ইউটিউব ভিডিও লিংকটি ডিফল্ট হিসেবে সেট করা হয়েছে
   const activeVideoUrl =
     videoUrl || "https://www.youtube.com/watch?v=1Z58KqDkLy0";
   const isDirectVideoFile = /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(activeVideoUrl);
 
-  // যেকোনো ইউটিউব লিংক থেকে নিখুঁত এমবেড ইউআরএল তৈরি করার ফাংশন
   const getEmbedUrl = (url: string) => {
     try {
-      let videoId = "1Z58KqDkLy0"; // সেফ ফলব্যাক
+      let videoId = "1Z58KqDkLy0";
 
       if (url.includes("youtube.com/watch")) {
         const urlParams = new URL(url).searchParams;
@@ -222,7 +222,15 @@ export function VideoShowcaseSection({
               powering ambitious ventures.
             </p>
 
-            <Link href="/about" className={styles.primaryBtn}>
+            {/* Guaranteed Clickable Button */}
+            <Link
+              href="/about"
+              className={styles.primaryBtn}
+              onClick={(e) => {
+                e.stopPropagation();
+                router.push("/about");
+              }}
+            >
               More About Us
               <ArrowUpRight size={17} strokeWidth={2.5} />
             </Link>

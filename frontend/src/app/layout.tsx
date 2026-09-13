@@ -45,7 +45,7 @@ export const metadata: Metadata = {
   },
 }
 
-// ✅ Root Layout
+// ✅ Root Layout (Hydration Warning Suppressed)
 export default function RootLayout({
   children,
 }: {
@@ -57,7 +57,7 @@ export default function RootLayout({
       className={`${syne.variable} ${dmSans.variable}`}
       suppressHydrationWarning
     >
-      <body className="font-body">
+      <body className="font-body" suppressHydrationWarning>
         {/* GSAP Init first */}
         <GSAPInit />
 

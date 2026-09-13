@@ -55,7 +55,7 @@ const TEAM_3D = [
   },
   {
     id: "4",
-    name: "ROJA",
+    name: "UMME HAFSA",
     role: "Director of Design, Product & AI",
     bio: "Bridging next-gen machine learning systems with clean, intuitive human-interface architecture.",
     img: "/Images/services/mobile-app-design.jpg",

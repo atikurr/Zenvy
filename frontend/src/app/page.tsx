@@ -1,4 +1,4 @@
-import { AboutSection } from '@/components/sections/AboutSection/AboutSection'
+
 import { HeroSection } from '@/components/sections/HeroSection/HeroSection'
 import { PartnersSection } from '@/components/sections/PartnersSection/PartnersSection'
 import { ServicesSection } from '@/components/sections/ServicesSection/ServicesSection'
@@ -12,7 +12,7 @@ export default function HomePage() {
       <PartnersSection />
       
       <VideoShowcaseSection />
-      <AboutSection />
+      
       <ServicesSection />
       <WorkSection />
     </>

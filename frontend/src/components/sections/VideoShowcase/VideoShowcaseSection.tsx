@@ -27,22 +27,29 @@ export function VideoShowcaseSection({
   const contentRef = useRef<HTMLDivElement>(null);
   const [isPlaying, setIsPlaying] = useState(false);
 
-  const activeVideoUrl = videoUrl || "https://www.youtube.com/watch?v=dQw4w9WgXcQ";
+  // আপনার দেওয়া কাঙ্ক্ষিত ইউটিউব ভিডিও লিংকটি ডিফল্ট হিসেবে সেট করা হয়েছে
+  const activeVideoUrl =
+    videoUrl || "https://www.youtube.com/watch?v=1Z58KqDkLy0";
   const isDirectVideoFile = /\.(mp4|webm|ogg|mov)(\?.*)?$/i.test(activeVideoUrl);
 
+  // যেকোনো ইউটিউব লিংক থেকে নিখুঁত এমবেড ইউআরএল তৈরি করার ফাংশন
   const getEmbedUrl = (url: string) => {
-    if (url.includes("youtube.com/watch?v=")) {
-      const id = url.split("v=")[1]?.split("&")[0];
-      return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1`;
+    try {
+      let videoId = "1Z58KqDkLy0"; // সেফ ফলব্যাক
+
+      if (url.includes("youtube.com/watch")) {
+        const urlParams = new URL(url).searchParams;
+        videoId = urlParams.get("v") || videoId;
+      } else if (url.includes("youtu.be/")) {
+        videoId = url.split("youtu.be/")[1]?.split("?")[0] || videoId;
+      } else if (url.includes("youtube.com/embed/")) {
+        videoId = url.split("youtube.com/embed/")[1]?.split("?")[0] || videoId;
+      }
+
+      return `https://www.youtube-nocookie.com/embed/${videoId}?autoplay=1&rel=0&modestbranding=1`;
+    } catch {
+      return `https://www.youtube-nocookie.com/embed/1Z58KqDkLy0?autoplay=1&rel=0&modestbranding=1`;
     }
-    if (url.includes("youtu.be/")) {
-      const id = url.split("youtu.be/")[1]?.split("?")[0];
-      return `https://www.youtube-nocookie.com/embed/${id}?autoplay=1`;
-    }
-    if (url.includes("youtube.com/embed/")) {
-      return url.includes("autoplay=1") ? url : `${url}?autoplay=1`;
-    }
-    return url;
   };
 
   useEffect(() => {
@@ -53,11 +60,10 @@ export function VideoShowcaseSection({
       if (isDesktop && videoCardRef.current && contentRef.current) {
         const card = videoCardRef.current;
         const cardRect = card.getBoundingClientRect();
-        
-        // স্ক্রিনের হরাইজন্টাল সেন্টার থেকে কার্ডের দূরত্ব
-        const startX = window.innerWidth / 2 - (cardRect.left + cardRect.width / 2);
-        
-        // ফুলস্ক্রিন কাভার করার জন্য প্রয়োজনীয় স্কেল
+
+        const startX =
+          window.innerWidth / 2 - (cardRect.left + cardRect.width / 2);
+
         const startScale = Math.max(
           window.innerWidth / cardRect.width,
           window.innerHeight / cardRect.height
@@ -74,7 +80,6 @@ export function VideoShowcaseSection({
           },
         });
 
-        // ১. ফুলস্ক্রিন সেন্টার থেকে স্মুথলি বামে ডক হবে
         tl.fromTo(
           card,
           {
@@ -92,35 +97,32 @@ export function VideoShowcaseSection({
           },
           0
         )
-        // ২. কার্ড স্কেল হওয়ার সময় ব্যাজটির সাইজ একই রকম নিখুঁত থাকবে
-        .fromTo(
-          badgeRef.current,
-          {
-            scale: 1 / startScale,
-          },
-          {
-            scale: 1,
-            ease: "power2.out",
-          },
-          0
-        )
-        // ৩. ডানের কনটেন্ট স্ট্যাগার হয়ে ভেসে উঠবে
-        .fromTo(
-          contentRef.current.children,
-          {
-            opacity: 0,
-            x: 35,
-          },
-          {
-            opacity: 1,
-            x: 0,
-            stagger: 0.05,
-            ease: "power2.out",
-          },
-          0.2
-        );
+          .fromTo(
+            badgeRef.current,
+            {
+              scale: 1 / startScale,
+            },
+            {
+              scale: 1,
+              ease: "power2.out",
+            },
+            0
+          )
+          .fromTo(
+            contentRef.current.children,
+            {
+              opacity: 0,
+              x: 35,
+            },
+            {
+              opacity: 1,
+              x: 0,
+              stagger: 0.05,
+              ease: "power2.out",
+            },
+            0.2
+          );
       } else if (!isDesktop && videoCardRef.current && contentRef.current) {
-        // মোবাইল ও ট্যাবলেট ট্রানজিশন
         gsap.fromTo(
           videoCardRef.current,
           { scale: 1.08, opacity: 0.9 },
@@ -179,7 +181,7 @@ export function VideoShowcaseSection({
               />
               <div className={styles.overlay} />
 
-              {/* Play Now বাটন সবসময় কার্ডের সেন্টারে থাকবে */}
+              {/* Play Now */}
               <div ref={badgeRef} className={styles.badgeWrapper}>
                 <div className={styles.rotatingDisc}>
                   <svg viewBox="0 0 100 100" className={styles.discSvg}>
@@ -205,7 +207,8 @@ export function VideoShowcaseSection({
           {/* ── RIGHT: BALANCED CENTERED CONTENT ── */}
           <div ref={contentRef} className={styles.contentColumn}>
             <h2 className={styles.title}>
-              One Partner. From Strategy to <span className={styles.lime}>Scale.</span>
+              One Partner. From Strategy to{" "}
+              <span className={styles.lime}>Scale.</span>
             </h2>
 
             <p className={styles.leadParagraph}>
@@ -226,8 +229,9 @@ export function VideoShowcaseSection({
 
             <div className={styles.testimonialBox}>
               <p className={styles.quoteText}>
-                &quot;The agency was remarkable to work with. Their technical execution
-                and product strategy were spot on, and they delivered beyond expectation.&quot;
+                &quot;The agency was remarkable to work with. Their technical
+                execution and product strategy were spot on, and they delivered
+                beyond expectation.&quot;
               </p>
 
               <div className={styles.authorRow}>
@@ -261,7 +265,10 @@ export function VideoShowcaseSection({
           >
             <X size={24} />
           </button>
-          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+          <div
+            className={styles.modalContent}
+            onClick={(e) => e.stopPropagation()}
+          >
             {isDirectVideoFile ? (
               <video
                 src={activeVideoUrl}

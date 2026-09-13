@@ -1,0 +1,353 @@
+/* =========================================================
+   CENTERED VIEWPORT & MIDDLE PLAY BADGE
+========================================================= */
+
+.wrapper {
+  width: 100%;
+  height: 100vh;
+  background-color: #050505;
+  color: #ffffff;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* স্ক্রিনের একদম সেন্টারে ব্যালান্সড কন্টেইনার */
+.innerContainer {
+  width: min(1320px, calc(100% - 48px));
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  position: relative;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1024px) {
+  .innerContainer {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 64px;
+    width: min(1320px, calc(100% - 64px));
+  }
+}
+
+/* ── LEFT COLUMN ── */
+.videoColWrapper {
+  width: 100%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (min-width: 1024px) {
+  .videoColWrapper {
+    width: 50%;
+    height: 560px;
+    flex-shrink: 0;
+  }
+}
+
+.videoCard {
+  position: relative;
+  width: 100%;
+  height: 380px;
+  border-radius: 20px;
+  overflow: hidden;
+  background-color: #0d0d12;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.8);
+  will-change: transform, border-radius;
+  transform-origin: center center;
+  z-index: 20;
+}
+
+@media (min-width: 640px) {
+  .videoCard {
+    height: 460px;
+    border-radius: 24px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .videoCard {
+    height: 100%;
+    border-radius: 28px;
+  }
+}
+
+.posterImage {
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+.videoCard:hover .posterImage {
+  transform: scale(1.03);
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.28);
+  transition: background 0.3s ease;
+}
+
+.videoCard:hover .overlay {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+/* ── বাটনটি সব সময় ভিডিও কার্ডের সেন্টারে থাকবে ── */
+.badgeWrapper {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+  pointer-events: none;
+}
+
+.rotatingDisc {
+  position: relative;
+  width: 95px;
+  height: 95px;
+  border-radius: 50%;
+  background: #dfff1a;
+  box-shadow: 0 0 35px rgba(223, 255, 26, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.3s cubic-bezier(0.2, 1, 0.3, 1);
+}
+
+@media (min-width: 768px) {
+  .rotatingDisc {
+    width: 115px;
+    height: 115px;
+  }
+}
+
+.videoCard:hover .rotatingDisc {
+  transform: scale(1.1);
+}
+
+.discSvg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  animation: spin 14s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.discText {
+  fill: #000000;
+  font-size: 8.5px;
+  font-weight: 800;
+  letter-spacing: 0.13em;
+  text-transform: uppercase;
+  font-family: inherit;
+}
+
+.playIconCenter {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 2px;
+}
+
+/* ── RIGHT COLUMN: BALANCED IN CENTER ── */
+.contentColumn {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  max-width: 520px;
+  box-sizing: border-box;
+}
+
+@media (min-width: 1024px) {
+  .contentColumn {
+    width: 48%;
+    flex-shrink: 0;
+  }
+}
+
+.title {
+  margin: 0;
+  font-size: clamp(28px, 3.2vw, 44px);
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.12;
+  color: #ffffff;
+}
+
+.lime {
+  color: #dfff1a;
+}
+
+.leadParagraph {
+  margin: 0;
+  font-size: clamp(14px, 1.4vw, 16px);
+  font-weight: 600;
+  color: #ffffff;
+  line-height: 1.45;
+}
+
+.bodyParagraph {
+  margin: 0;
+  font-size: clamp(12.5px, 1.2vw, 14px);
+  color: #a1a1aa;
+  line-height: 1.6;
+}
+
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 28px;
+  border-radius: 999px;
+  background: #dfff1a;
+  color: #050505;
+  font-size: 13px;
+  font-weight: 700;
+  text-decoration: none;
+  width: fit-content;
+  margin: 6px auto 0;
+  box-shadow: 0 0 25px rgba(223, 255, 26, 0.35);
+  transition: all 0.25s ease;
+}
+
+@media (min-width: 1024px) {
+  .primaryBtn {
+    margin: 6px 0 0 0;
+  }
+}
+
+.primaryBtn:hover {
+  background: #ffffff;
+  color: #050505;
+  box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+/* ── TESTIMONIAL BOX ── */
+.testimonialBox {
+  margin-top: 8px;
+  padding: 18px 20px;
+  border-radius: 18px;
+  background: #0c0c11;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.quoteText {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.55;
+  color: #d4d4d8;
+  font-style: italic;
+}
+
+.authorRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+}
+
+.authorName {
+  margin: 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: #ffffff;
+}
+
+.authorRole {
+  margin: 0;
+  font-size: 11px;
+  color: #71717a;
+}
+
+/* ── VIDEO MODAL ── */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(16px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+.closeBtn {
+  position: absolute;
+  top: 24px;
+  right: 24px;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.closeBtn:hover {
+  background: #dfff1a;
+  color: #000000;
+}
+
+.modalContent {
+  width: 100%;
+  max-width: 900px;
+  aspect-ratio: 16 / 9;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9);
+}
+
+.iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+}
